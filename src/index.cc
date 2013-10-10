@@ -83,6 +83,8 @@ git_index *GitIndex::GetValue() {
 }
 
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {String} index_path
  * @param {Index} callback
@@ -120,8 +122,8 @@ void GitIndex::OpenWork(uv_work_t *req) {
     baton->index_path
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -149,6 +151,9 @@ void GitIndex::OpenAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -162,6 +167,8 @@ void GitIndex::OpenAfterWork(uv_work_t *req) {
   free((void *)baton->index_path);
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  */
@@ -191,8 +198,8 @@ void GitIndex::ReadWork(uv_work_t *req) {
     baton->index
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -214,6 +221,9 @@ void GitIndex::ReadAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -226,6 +236,8 @@ void GitIndex::ReadAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  */
@@ -255,8 +267,8 @@ void GitIndex::WriteWork(uv_work_t *req) {
     baton->index
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -278,6 +290,9 @@ void GitIndex::WriteAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -290,6 +305,8 @@ void GitIndex::WriteAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Tree} tree
@@ -328,8 +345,8 @@ void GitIndex::ReadTreeWork(uv_work_t *req) {
     baton->tree
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -351,6 +368,9 @@ void GitIndex::ReadTreeAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -364,6 +384,8 @@ void GitIndex::ReadTreeAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Oid} callback
@@ -396,8 +418,8 @@ void GitIndex::WriteTreeWork(uv_work_t *req) {
     baton->index
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -425,6 +447,9 @@ void GitIndex::WriteTreeAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -570,6 +595,8 @@ Handle<Value> GitIndex::RemoveDirectory(const Arguments& args) {
   return Undefined();
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {String} path
  */
@@ -608,8 +635,8 @@ void GitIndex::AddBypathWork(uv_work_t *req) {
     baton->path
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -631,6 +658,9 @@ void GitIndex::AddBypathAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -760,6 +790,8 @@ Handle<Value> GitIndex::HasConflicts(const Arguments& args) {
   return scope.Close(to);
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {Repository} repo
  * @param {Index} index
@@ -770,12 +802,6 @@ Handle<Value> GitIndex::IndexToWorkdir(const Arguments& args) {
   HandleScope scope;
       if (args.Length() == 0 || !args[0]->IsObject()) {
     return ThrowException(Exception::Error(String::New("Repository repo is required.")));
-  }
-  if (args.Length() == 1 || !args[1]->IsObject()) {
-    return ThrowException(Exception::Error(String::New("Index index is required.")));
-  }
-  if (args.Length() == 2 || !args[2]->IsObject()) {
-    return ThrowException(Exception::Error(String::New("DiffOptions opts is required.")));
   }
 
   if (args.Length() == 3 || !args[3]->IsFunction()) {
@@ -792,12 +818,20 @@ Handle<Value> GitIndex::IndexToWorkdir(const Arguments& args) {
           baton->repo = from_repo;
     baton->indexReference = Persistent<Value>::New(args[1]);
     git_index * from_index;
+      if (args[1]->IsObject()) {
             from_index = ObjectWrap::Unwrap<GitIndex>(args[1]->ToObject())->GetValue();
-          baton->index = from_index;
+          } else {
+      from_index = 0;
+    }
+      baton->index = from_index;
     baton->optsReference = Persistent<Value>::New(args[2]);
     const git_diff_options * from_opts;
+      if (args[2]->IsObject()) {
             from_opts = ObjectWrap::Unwrap<GitDiffOptions>(args[2]->ToObject())->GetValue();
-          baton->opts = from_opts;
+          } else {
+      from_opts = 0;
+    }
+      baton->opts = from_opts;
     baton->callback = Persistent<Function>::New(Local<Function>::Cast(args[3]));
 
   uv_queue_work(uv_default_loop(), &baton->request, IndexToWorkdirWork, (uv_after_work_cb)IndexToWorkdirAfterWork);
@@ -814,8 +848,8 @@ void GitIndex::IndexToWorkdirWork(uv_work_t *req) {
     baton->opts
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -843,6 +877,9 @@ void GitIndex::IndexToWorkdirAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }

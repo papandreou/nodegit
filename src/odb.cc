@@ -168,6 +168,8 @@ Handle<Value> GitOdb::AddDiskAlternate(const Arguments& args) {
   return Undefined();
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {Oid} id
  * @param {OdbObject} callback
@@ -207,8 +209,8 @@ void GitOdb::ReadWork(uv_work_t *req) {
     baton->id
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -236,6 +238,9 @@ void GitOdb::ReadAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -393,6 +398,8 @@ Handle<Value> GitOdb::Refresh(const Arguments& args) {
   return Undefined();
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {String} data
  * @param {Number} len
@@ -452,8 +459,8 @@ void GitOdb::WriteWork(uv_work_t *req) {
     baton->type
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -481,6 +488,9 @@ void GitOdb::WriteAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }

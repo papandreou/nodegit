@@ -1,3 +1,5 @@
+#include "../include/functions/copy.h"
+
 /**
 <% include doc.cc.ejs -%>
  */
@@ -56,8 +58,8 @@ void <%- cppClassName %>::<%- functionInfo.cppFunctionName %>Work(uv_work_t *req
   );
 <% if (functionInfo.return.isErrorCode) { -%>
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 <% } else if (functionInfo.return.cType != "void") { -%>
   baton->result = result;
@@ -99,6 +101,9 @@ void <%- cppClassName %>::<%- functionInfo.cppFunctionName %>AfterWork(uv_work_t
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }

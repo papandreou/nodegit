@@ -76,6 +76,8 @@ git_submodule *GitSubmodule::GetValue() {
 }
 
 
+#include "../include/functions/copy.h"
+
 /**
  */
 Handle<Value> GitSubmodule::AddFinalize(const Arguments& args) {
@@ -104,8 +106,8 @@ void GitSubmodule::AddFinalizeWork(uv_work_t *req) {
     baton->submodule
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -127,6 +129,9 @@ void GitSubmodule::AddFinalizeAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -139,6 +144,8 @@ void GitSubmodule::AddFinalizeAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Number} write_index
@@ -177,8 +184,8 @@ void GitSubmodule::AddToIndexWork(uv_work_t *req) {
     baton->write_index
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -200,6 +207,9 @@ void GitSubmodule::AddToIndexAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -213,6 +223,8 @@ void GitSubmodule::AddToIndexAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  */
@@ -242,8 +254,8 @@ void GitSubmodule::SaveWork(uv_work_t *req) {
     baton->submodule
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -265,6 +277,9 @@ void GitSubmodule::SaveAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -401,6 +416,8 @@ Handle<Value> GitSubmodule::HeadId(const Arguments& args) {
   return scope.Close(to);
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {Number} overwrite
  */
@@ -438,8 +455,8 @@ void GitSubmodule::InitWork(uv_work_t *req) {
     baton->overwrite
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -461,6 +478,9 @@ void GitSubmodule::InitAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -474,6 +494,8 @@ void GitSubmodule::InitAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  */
@@ -503,8 +525,8 @@ void GitSubmodule::SyncWork(uv_work_t *req) {
     baton->submodule
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -526,6 +548,9 @@ void GitSubmodule::SyncAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -538,6 +563,8 @@ void GitSubmodule::SyncAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Repository} callback
@@ -569,8 +596,8 @@ void GitSubmodule::OpenWork(uv_work_t *req) {
     baton->submodule
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -598,6 +625,9 @@ void GitSubmodule::OpenAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -610,6 +640,8 @@ void GitSubmodule::OpenAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  */
@@ -639,8 +671,8 @@ void GitSubmodule::ReloadWork(uv_work_t *req) {
     baton->submodule
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -662,6 +694,9 @@ void GitSubmodule::ReloadAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -674,6 +709,8 @@ void GitSubmodule::ReloadAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Number} status
@@ -712,8 +749,8 @@ void GitSubmodule::StatusWork(uv_work_t *req) {
     baton->submodule
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -735,6 +772,9 @@ void GitSubmodule::StatusAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }

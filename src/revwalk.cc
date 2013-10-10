@@ -86,6 +86,8 @@ Handle<Value> GitRevWalk::Reset(const Arguments& args) {
   return Undefined();
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {Oid} id
  */
@@ -123,8 +125,8 @@ void GitRevWalk::PushWork(uv_work_t *req) {
     baton->id
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -146,6 +148,9 @@ void GitRevWalk::PushAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -159,6 +164,8 @@ void GitRevWalk::PushAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {String} glob
@@ -198,8 +205,8 @@ void GitRevWalk::PushGlobWork(uv_work_t *req) {
     baton->glob
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -221,6 +228,9 @@ void GitRevWalk::PushGlobAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -235,6 +245,8 @@ void GitRevWalk::PushGlobAfterWork(uv_work_t *req) {
   free((void *)baton->glob);
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  */
@@ -264,8 +276,8 @@ void GitRevWalk::PushHeadWork(uv_work_t *req) {
     baton->walk
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -287,6 +299,9 @@ void GitRevWalk::PushHeadAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -299,6 +314,8 @@ void GitRevWalk::PushHeadAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Oid} commit_id
@@ -337,8 +354,8 @@ void GitRevWalk::HideWork(uv_work_t *req) {
     baton->commit_id
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -360,6 +377,9 @@ void GitRevWalk::HideAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -373,6 +393,8 @@ void GitRevWalk::HideAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {String} glob
@@ -412,8 +434,8 @@ void GitRevWalk::HideGlobWork(uv_work_t *req) {
     baton->glob
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -435,6 +457,9 @@ void GitRevWalk::HideGlobAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -449,6 +474,8 @@ void GitRevWalk::HideGlobAfterWork(uv_work_t *req) {
   free((void *)baton->glob);
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  */
@@ -478,8 +505,8 @@ void GitRevWalk::HideHeadWork(uv_work_t *req) {
     baton->walk
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -501,6 +528,9 @@ void GitRevWalk::HideHeadAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -513,6 +543,8 @@ void GitRevWalk::HideHeadAfterWork(uv_work_t *req) {
   baton->callback.Dispose();
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {String} refname
@@ -552,8 +584,8 @@ void GitRevWalk::PushRefWork(uv_work_t *req) {
     baton->refname
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -575,6 +607,9 @@ void GitRevWalk::PushRefAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -589,6 +624,8 @@ void GitRevWalk::PushRefAfterWork(uv_work_t *req) {
   free((void *)baton->refname);
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {String} refname
@@ -628,8 +665,8 @@ void GitRevWalk::HideRefWork(uv_work_t *req) {
     baton->refname
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -651,6 +688,9 @@ void GitRevWalk::HideRefAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -665,6 +705,8 @@ void GitRevWalk::HideRefAfterWork(uv_work_t *req) {
   free((void *)baton->refname);
   delete baton;
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Oid} callback
@@ -697,8 +739,8 @@ void GitRevWalk::NextWork(uv_work_t *req) {
     baton->walk
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -726,6 +768,9 @@ void GitRevWalk::NextAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }

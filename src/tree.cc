@@ -208,6 +208,8 @@ Handle<Value> GitTree::EntryByOid(const Arguments& args) {
   return scope.Close(to);
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {String} path
  * @param {TreeEntry} callback
@@ -248,8 +250,8 @@ void GitTree::GetEntryWork(uv_work_t *req) {
     baton->path
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -277,6 +279,9 @@ void GitTree::GetEntryAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -320,6 +325,8 @@ Handle<Value> GitTree::Builder(const Arguments& args) {
   }
   return scope.Close(to);
 }
+
+#include "../include/functions/copy.h"
 
 /**
  * @param {Repository} repo
@@ -379,8 +386,8 @@ void GitTree::DiffTreeWork(uv_work_t *req) {
     baton->opts
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -408,6 +415,9 @@ void GitTree::DiffTreeAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -424,6 +434,8 @@ void GitTree::DiffTreeAfterWork(uv_work_t *req) {
   delete baton;
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {Repository} repo
  * @param {Index} index
@@ -434,12 +446,6 @@ Handle<Value> GitTree::DiffIndex(const Arguments& args) {
   HandleScope scope;
       if (args.Length() == 0 || !args[0]->IsObject()) {
     return ThrowException(Exception::Error(String::New("Repository repo is required.")));
-  }
-  if (args.Length() == 1 || !args[1]->IsObject()) {
-    return ThrowException(Exception::Error(String::New("Index index is required.")));
-  }
-  if (args.Length() == 2 || !args[2]->IsObject()) {
-    return ThrowException(Exception::Error(String::New("DiffOptions opts is required.")));
   }
 
   if (args.Length() == 3 || !args[3]->IsFunction()) {
@@ -458,12 +464,20 @@ Handle<Value> GitTree::DiffIndex(const Arguments& args) {
   baton->old_tree = ObjectWrap::Unwrap<GitTree>(args.This())->GetValue();
   baton->indexReference = Persistent<Value>::New(args[1]);
     git_index * from_index;
+      if (args[1]->IsObject()) {
             from_index = ObjectWrap::Unwrap<GitIndex>(args[1]->ToObject())->GetValue();
-          baton->index = from_index;
+          } else {
+      from_index = 0;
+    }
+      baton->index = from_index;
     baton->optsReference = Persistent<Value>::New(args[2]);
     const git_diff_options * from_opts;
+      if (args[2]->IsObject()) {
             from_opts = ObjectWrap::Unwrap<GitDiffOptions>(args[2]->ToObject())->GetValue();
-          baton->opts = from_opts;
+          } else {
+      from_opts = 0;
+    }
+      baton->opts = from_opts;
     baton->callback = Persistent<Function>::New(Local<Function>::Cast(args[3]));
 
   uv_queue_work(uv_default_loop(), &baton->request, DiffIndexWork, (uv_after_work_cb)DiffIndexAfterWork);
@@ -481,8 +495,8 @@ void GitTree::DiffIndexWork(uv_work_t *req) {
     baton->opts
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -510,6 +524,9 @@ void GitTree::DiffIndexAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
@@ -526,6 +543,8 @@ void GitTree::DiffIndexAfterWork(uv_work_t *req) {
   delete baton;
 }
 
+#include "../include/functions/copy.h"
+
 /**
  * @param {Repository} repo
  * @param {DiffOptions} opts
@@ -535,9 +554,6 @@ Handle<Value> GitTree::DiffWorkDir(const Arguments& args) {
   HandleScope scope;
       if (args.Length() == 0 || !args[0]->IsObject()) {
     return ThrowException(Exception::Error(String::New("Repository repo is required.")));
-  }
-  if (args.Length() == 1 || !args[1]->IsObject()) {
-    return ThrowException(Exception::Error(String::New("DiffOptions opts is required.")));
   }
 
   if (args.Length() == 2 || !args[2]->IsFunction()) {
@@ -556,8 +572,12 @@ Handle<Value> GitTree::DiffWorkDir(const Arguments& args) {
   baton->old_tree = ObjectWrap::Unwrap<GitTree>(args.This())->GetValue();
   baton->optsReference = Persistent<Value>::New(args[1]);
     const git_diff_options * from_opts;
+      if (args[1]->IsObject()) {
             from_opts = ObjectWrap::Unwrap<GitDiffOptions>(args[1]->ToObject())->GetValue();
-          baton->opts = from_opts;
+          } else {
+      from_opts = 0;
+    }
+      baton->opts = from_opts;
     baton->callback = Persistent<Function>::New(Local<Function>::Cast(args[2]));
 
   uv_queue_work(uv_default_loop(), &baton->request, DiffWorkDirWork, (uv_after_work_cb)DiffWorkDirAfterWork);
@@ -574,8 +594,8 @@ void GitTree::DiffWorkDirWork(uv_work_t *req) {
     baton->opts
   );
   baton->error_code = result;
-  if (result != GIT_OK) {
-    baton->error = giterr_last();
+  if (result != GIT_OK && giterr_last() != NULL) {
+    baton->error = git_error_dup(giterr_last());
   }
 }
 
@@ -603,6 +623,9 @@ void GitTree::DiffWorkDirAfterWork(uv_work_t *req) {
         Exception::Error(String::New(baton->error->message))
       };
       baton->callback->Call(Context::GetCurrent()->Global(), 1, argv);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
     } else {
       baton->callback->Call(Context::GetCurrent()->Global(), 0, NULL);
     }
