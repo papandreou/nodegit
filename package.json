@@ -1,7 +1,7 @@
 {
   "name": "nodegit-papandreou",
   "description": "Node.js libgit2 asynchronous native bindings",
-  "version": "0.1.0patch2",
+  "version": "0.1.0patch3",
   "homepage": "https://github.com/tbranyen/nodegit",
   "keywords": [
     "libgit2",
